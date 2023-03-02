@@ -31,17 +31,15 @@ fi
 
 java -cp $CPATH org.junit.runner.JUnitCore TestListExamples > junit-results.txt
 
-grep "FAILURES!!!" junit-results.txt > results.txt
+num_passed=$(sed -n '2!p' junit-results.txt | grep -c -m 1 ".")
+num_failed=$(sed -n '2!p' junit-results.txt | grep -c -m 1 "E")
 
-RESULTS=`cat results.txt`
+total_tests=$((num_passed + num_failed))
 
-if [ $RESULTS ]
-then
-    if [ $RESULTS == "FAILURES!!!" ]
-    then
-        echo "You failed, try again."
-        exit 1
-    fi
+grade=$((num_passed * 100 / total_tests))
+
+if [[ "$num_failed" -eq 0 ]]; then
+    echo "Congratulations, all $total_tests test(s) passed! Your grade is $grade%."
 else
-    echo "You passed! Great job."
+    echo "Some tests failed ($num_failed out of $total_tests). Your grade is $grade%."
 fi
